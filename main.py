@@ -54,8 +54,7 @@ class Bot:
         resp = self.s.post(BASE + "/modules/opsparings-spil/ajax.php", data=payload, headers={"X-Requested-With": "XMLHttpRequest"}).json()
 
         if resp["type"] == "error":
-            print resp
-            raise Exception()
+            raise Exception(resp)
         else:
             return resp
 
@@ -69,8 +68,7 @@ class Bot:
         resp = self.s.post(BASE + "/modules/opsparings-spil/ajax.php", data=payload, headers={"X-Requested-With": "XMLHttpRequest"}).json()
 
         if resp["type"] == "error":
-            print resp
-            raise Exception()
+            raise Exception(resp)
         else:
             return resp        
 
@@ -83,21 +81,27 @@ class Bot:
         resp = self.s.post(BASE + "/modules/opsparings-spil/ajax.php", data=payload, headers={"X-Requested-With": "XMLHttpRequest"}).json()
 
         if resp["type"] == "error":
-            print resp
-            raise Exception()
+            raise Exception(resp)
         else:
             return resp
 
 if __name__ == "__main__":
-    bot = Bot(sessionCookie=sys.argv[1])
-    print("Previous saldo:")
-    print(json.dumps(bot.saldo(), indent=2, sort_keys=True))
+    if len(sys.argv) != 2:
+        print("You have to supply your sessionToken as an argument")
+        exit()
 
-    print("\nGame information:")
-    game = bot.startGame()
-    print(json.dumps(game, indent=2, sort_keys=True))
-    if bot.shootTargets(game["amountOfBalloons"])["type"] == "success":
-        print("Targets shot")
-    
-    print("\nNew saldo:")
-    print(json.dumps(bot.saldo(), indent=2, sort_keys=True))
+    try:
+        bot = Bot(sessionCookie=sys.argv[1])
+        print("Previous saldo:")
+        print(json.dumps(bot.saldo(), indent=2, sort_keys=True))
+
+        print("\nGame information:")
+        game = bot.startGame()
+        print(json.dumps(game, indent=2, sort_keys=True))
+        if bot.shootTargets(game["amountOfBalloons"])["type"] == "success":
+            print("Targets shot")
+        
+        print("\nNew saldo:")
+        print(json.dumps(bot.saldo(), indent=2, sort_keys=True))
+    except Exception as e:
+        print("Server returned an error: %s" % str(e))
